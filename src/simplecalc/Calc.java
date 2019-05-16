@@ -1,45 +1,129 @@
 package simplecalc;
 
-import java.util.List;
+import java.util.HashMap;
+
 
 public class Calc {
-    static final char ADDITION = '+';
-    static final char SUBTRACTION = '-';
-    static final char MULTIPLICATION = '*';
-    static final char DIVISION = '/';
 
-    public String stringCalc(String textField) {
-       PrepareForCalc prepareForCalc = new PrepareForCalc(textField);
-        List<Integer> numbers = prepareForCalc.getNumbers();
-        List<Character> orders = prepareForCalc.getOrders();
+    private Stack numbersStack = new Stack();
+    private  Stack operatorsStack = new Stack();
 
-        int num = 0;
+    private String[] operatorsArray = {"/", "*", "-", "+"};
 
-        for (int i = 0; i < orders.size(); i++) {
-            if (i == 0) {
-                num = numbers.get(i);
+    //Конструктор
+    public Calc() {
+
+    }
+
+    private HashMap createPriorityMap(){
+        HashMap<String, Integer> map = new HashMap<>();
+
+        for (String operator : operatorsArray) {
+            if (operator.equals("/") || operator.equals("*")) {
+                map.put(operator, 2);
+            }else if (operator.equals("-") || operator.equals("+")) {
+                map.put(operator, 1);
             }
-            if (i + 1 < numbers.size()) {
-                switch (orders.get(i)) {
-                    case DIVISION:
-                        num = num / numbers.get(i + 1);
-                        break;
-                    case MULTIPLICATION:
-                        num = num * numbers.get(i + 1);
-                        break;
-                    case SUBTRACTION:
-                        num = num - numbers.get(i + 1);
-                        break;
-                    case ADDITION:
-                        num = num + numbers.get(i + 1);
-                        break;
-                }
-            }
-
         }
 
-        System.out.print("= " + num);
+        return map;
+    }
+    //Логика
+     String calculate(String expression) {
 
-        return num + "";
+        TokensCreator tokensCreator = new TokensCreator(expression);
+        HashMap <String, Integer> priorityMap = createPriorityMap();
+
+        //Перебор токенов
+        for (String token : tokensCreator.getTokenList()) {
+            if (token.matches("[/*+-]")) {
+
+                binaryOperatorsConditions(token, priorityMap);
+            }
+            else if (token.matches("[()]")) {
+
+                bracketsConditions(token);
+
+                }
+            else numbersStack.addToStack(token);
+        }
+        while (!operatorsStack.IsEmpty()) {
+
+            numbersStack.addToStack(doAction());
+        }
+
+        return (String) numbersStack.getTokenFromStack();
+
+    }
+    //Основная калькуляция
+    private String doAction() {
+        int temp = 0;
+        String tempOperator = (String) operatorsStack.getTokenFromStack();
+        int num1, num2;
+        num2 = Integer.parseInt((String) numbersStack.getTokenFromStack());
+        numbersStack.remove();
+        num1 = Integer.parseInt((String) numbersStack.getTokenFromStack());
+        numbersStack.remove();
+
+        switch (tempOperator) {
+            case "/" :
+                temp = num1 / num2;
+                break;
+            case "*" :
+                temp = num1 * num2;
+                break;
+            case "-" :
+                temp = num1 - num2;
+                break;
+            case "+" :
+                temp = num1 + num2;
+                break;
+        }
+
+        operatorsStack.remove();
+
+        return temp + "";
+    }
+    // Условия совершения бинарных операций
+    private void binaryOperatorsConditions(String token, HashMap<String, Integer> priorityMap) {
+        if (operatorsStack.IsEmpty()) {
+            operatorsStack.addToStack(token);
+
+        } else if (operatorsStack.getTokenFromStack().equals("(") || priorityMap.get(token) > priorityMap.get(operatorsStack.getTokenFromStack())) {
+            operatorsStack.addToStack(token);
+
+        }
+        else if (priorityMap.get(token) <= priorityMap.get(operatorsStack.getTokenFromStack())) {
+
+            while (!operatorsStack.IsEmpty() && !operatorsStack.getTokenFromStack().equals("(") && priorityMap.get(token) <= priorityMap.get(operatorsStack.getTokenFromStack())) {
+                numbersStack.addToStack(doAction());
+            }
+            operatorsStack.addToStack(token);
+
+        }
+    }
+    // Действия при скобка
+    private void bracketsConditions(String token) {
+        switch (token) {
+            case "(" :
+                operatorsStack.addToStack(token);
+                break;
+            case ")" :
+                if (operatorsStack.getTokenFromStack().equals("(")) {
+                    operatorsStack.remove();
+                } else while (!operatorsStack.getTokenFromStack().equals("(")) {
+                    numbersStack.addToStack(doAction());
+                }
+                operatorsStack.remove();
+                break;
+        }
+    }
+    // Метод для проверки
+    public static void main(String[] args) {
+        Calc calc = new Calc();
+        System.out.println(calc.calculate("15+45-(2+5*6)-5"));
     }
 }
+
+
+

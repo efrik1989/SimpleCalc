@@ -11,30 +11,6 @@ public class SimpleCalc {
 
     private static final char EQUALLY = '=';
     private static final char CANCEL = 'C';
-    private static boolean isDouble;
-    private static Calc calc;
-
-    public static void main(String[] args) {
-        List<JButton> buttonList;
-
-        JFrame window = new CalcGUI();
-        window.setVisible(true);
-        window.pack();
-
-        buttonList = CalcGUI.getButtonList();
-        buttonList.addAll(CalcGUI.getFunctionButtonList2());
-        buttonList.addAll(CalcGUI.getListOnTop());
-
-        addJButtonListener(buttonList);
-    }
-
-    //В зависимости от результатов проверки на плавующую точку, создание экземпляра Calc
-    public static void equallyAction() {
-        isDouble = Check.getIsDouble();
-        if(isDouble){
-            calc = new DoubleCalc();
-        } else calc = new IntCalc();
-    }
 
     private static void addJButtonListener(List<JButton> list) {
 
@@ -56,12 +32,14 @@ public class SimpleCalc {
             buttonCommand = e.getActionCommand();
             if (!buttonCommand.equals(".")) {
                     if (temp != null) {
-                        temp = temp + buttonCommand;
+                        if (!buttonCommand.equals(EQUALLY)) {
+                            temp = temp + buttonCommand;
+                        }
                         getTextField().setText(temp);
                         switch (buttonCommand.charAt(0)) {
                             case EQUALLY:
-                                SimpleCalc.equallyAction();
-                                getTextField().setText(calc.stringCalc(getTemp()));
+                                Calc calc = new Calc();
+                                getTextField().setText(calc.calculate(getTemp().replaceAll("=", "").replaceAll(" ", "")));
                                 System.out.println("SimpleCalc.stringCalc вызов = " + getTextField().getText());
                                 break;
                             case CANCEL:
@@ -81,10 +59,26 @@ public class SimpleCalc {
             NumberListener.temp = temp;
         }
 
+        //Метод очистки поля ввода и выражения
         private void cancel() {
             setTemp("");
             getTextField().setText("");
         }
+    }
+
+    //Запуск программы
+    public static void main(String[] args) {
+        List<JButton> buttonList;
+
+        JFrame window = new CalcGUI();
+        window.setVisible(true);
+        window.pack();
+
+        buttonList = CalcGUI.getButtonList();
+        buttonList.addAll(CalcGUI.getFunctionButtonList2());
+        buttonList.addAll(CalcGUI.getListOnTop());
+
+        addJButtonListener(buttonList);
     }
 
 
