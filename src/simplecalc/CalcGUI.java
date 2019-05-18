@@ -67,9 +67,11 @@ public class CalcGUI extends JFrame {
     private void doActionInDocument(DocumentEvent e) {
         Document doc = e.getDocument();
         try {
-            SimpleCalc.NumberListener.setTemp(doc.getText(0,doc.getLength()));
-            System.out.println("CalcGUI.doActionInDocument() called SimpleCalc.NumberListener.getTemp() = " + SimpleCalc.NumberListener.getTemp());
+            NumberListener.setTemp(doc.getText(0,doc.getLength()));
+            System.out.println("CalcGUI.doActionInDocument() called SimpleCalc.NumberListener.getTemp() = " + NumberListener.getTemp());
         } catch (BadLocationException e1) {
+            e1.printStackTrace();
+        } catch (Exception e1) {
             e1.printStackTrace();
         }
 
@@ -157,6 +159,7 @@ public class CalcGUI extends JFrame {
 
         return panel;
     }
+
 
     public static JTextField getTextField() {
         return textField;

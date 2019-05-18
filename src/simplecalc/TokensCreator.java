@@ -34,7 +34,11 @@ class TokensCreator {
                 tokenList.add(temp.toString());
                 temp.setLength(0);
             }
-        } else {
+        } else if (symbol == '-') {
+            unoOperationsCheck(symbol, index);
+        }
+        else {
+
             if (temp.length() != 0) {
                 tokenList.add(temp.toString());
                 temp.setLength(0);
@@ -43,20 +47,27 @@ class TokensCreator {
             tokenList.add(s);
 
         }
-
     }
     //Получение спсика токенов
     public List<String> getTokenList() {
         return tokenList;
     }
+    //Проверка на унарные операции (-)
+    private void unoOperationsCheck(char symbol, int index) {
+        if (index == 0 || expression.charAt(index - 1) == '/' || expression.charAt(index - 1) == '*' || expression.charAt(index - 1) == '+' || expression.charAt(index - 1) == '(') {
+            temp.append(symbol);
+        }
+    }
 
     // Проверка работы
     public static void main(String[] args) {
-        TokensCreator tokens = new TokensCreator("123+15-12*2");
+        TokensCreator tokens = new TokensCreator("-123+15-(-12*2)*-2");
 
         for (String list : tokens.getTokenList()) {
             System.out.println(list);
         }
     }
+
+
 
 }

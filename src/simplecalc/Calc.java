@@ -52,17 +52,17 @@ public class Calc {
             numbersStack.addToStack(doAction());
         }
 
-        return (String) numbersStack.getTokenFromStack();
+        return cheсkNumbersAfterPoint((String) numbersStack.getTokenFromStack());
 
     }
     //Основная калькуляция
     private String doAction() {
-        int temp = 0;
+        double temp = 0.0;
         String tempOperator = (String) operatorsStack.getTokenFromStack();
-        int num1, num2;
-        num2 = Integer.parseInt((String) numbersStack.getTokenFromStack());
+        double num1, num2;
+        num2 = Double.parseDouble((String) numbersStack.getTokenFromStack());
         numbersStack.remove();
-        num1 = Integer.parseInt((String) numbersStack.getTokenFromStack());
+        num1 = Double.parseDouble((String) numbersStack.getTokenFromStack());
         numbersStack.remove();
 
         switch (tempOperator) {
@@ -118,10 +118,36 @@ public class Calc {
                 break;
         }
     }
+    // Проверка на знаки после плавающей точки и убирание плавающей точки если число целое
+    private String cheсkNumbersAfterPoint(String resultOfExpression) {
+        int result;
+        int countAfterPoint = 0;
+        int indexOfPoint = 0;
+        char symbol;
+        boolean point = false;
+
+        for (int i = 0; i < resultOfExpression.length(); i++){
+            symbol = resultOfExpression.charAt(i);
+            if (symbol == '.') {
+                indexOfPoint = i;
+                point = true;
+            }
+            if (indexOfPoint != i && indexOfPoint < i && point) {
+                countAfterPoint++;
+            }
+        }
+
+        if (countAfterPoint == 1) {
+            result = (int) Double.parseDouble(resultOfExpression);
+        } else return resultOfExpression;
+
+        return result + "";
+    }
     // Метод для проверки
     public static void main(String[] args) {
         Calc calc = new Calc();
-        System.out.println(calc.calculate("15+45-(2+5*6)-5"));
+        System.out.println(calc.calculate("10/5"));
+
     }
 }
 
