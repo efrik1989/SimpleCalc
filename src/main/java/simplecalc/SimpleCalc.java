@@ -4,18 +4,25 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+/**
+ * Основной клас, запускающий программу
+ */
 public class SimpleCalc {
 
-    //Добавление слушателя на кнопки
-    private static void addJButtonListener(List<JButton> list) {
+    /**
+     * Добавление слушателя на кнопки
+     */
+    private static void addJButtonListener(List<JButton> buttonList) {
 
         ActionListener actionListener = new NumberListener();
-        for (JButton button : list) {
+        for (JButton button : buttonList) {
             button.addActionListener(actionListener);
         }
     }
 
-    //Запуск программы
+    /**
+     * Запуск программы, взаимодействи с кнопками и GUI
+     */
     public static void main(String[] args) {
         List<JButton> buttonList;
 
